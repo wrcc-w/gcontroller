@@ -1,15 +1,23 @@
 <?php
 namespace Westreels\WestreelsMain\Gate;
 
-
+use Westreels\WestreelsMain\Gate\GateFunctions;
 use Illuminate\Http\Request;
 use Validator;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class PlayerGateController extends \Westreels\WestreelsMain\Gate\GateFunctions
 {
+
+    protected $gatefunctions;
+
+    public function __construct(GateFunctions $gatefunctions)
+    {
+        $this->mainGate = $gatefunctions;
+    }
 
     public function playerLogin(Request $request)
     {
@@ -22,15 +30,14 @@ class PlayerGateController extends \Westreels\WestreelsMain\Gate\GateFunctions
         ]);
 
         if ($validator->stopOnFirstFailure()->fails()) {
-            return response()->json(['status' => 400, 'error' => 'Validation of request form failed.', 'validation_messages' => $validator->errors(), 'request_ip' => $_SERVER['REMOTE_ADDR']])->setStatusCode(400);
+            return response()->json(['status' => 400, 'error' => 'Validation of request failed.', 'validation_messages' => $validator->errors()])->setStatusCode(400);
         }
 
-        $hash = hash_hmac('sha256', '42104120210', '5|1652281688');
+        // API access
+        $verifyApi = $this->mainGate($request);
+        if(!$verifyApi) { return $verifyApi; }
 
-        $headerApikey = $request->header('x-apikey');
-        $headerTimestamp = $request->header('x-time');
 
-        return array('hash' => $hash, 'apikey' => $headerApikey, 'timestamp' => $headerTimestamp);
         $user = User::where('email', $request->email)->first();
 
         $newUserCreated = false;
@@ -39,6 +46,8 @@ class PlayerGateController extends \Westreels\WestreelsMain\Gate\GateFunctions
 
             $user = \App\Models\User::create([
                     'name' => $request->name,
+                    'player_id' => $request->player_id,
+                    'currency' => $request->currency,
                     'password' => bcrypt($request->password),
                     'email' => $request->email,
             ]);
@@ -51,7 +60,14 @@ class PlayerGateController extends \Westreels\WestreelsMain\Gate\GateFunctions
             $token = $user->createToken('player:auth', ['remember']);
         }
 
-        return ['user' => $user, 'token' => $token];
+        $loginToken = Str::random(60);
+ 
+        $user->forceFill([
+            'api_token' => hash('sha256', $loginToken),
+        ])->save();
+
+
+        return ['player' => $user, 'game_id' => $token->plainTextToken, 'login_token' => $loginToken];
     }
 
 

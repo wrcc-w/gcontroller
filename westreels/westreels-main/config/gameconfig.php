@@ -10,8 +10,21 @@ return [
     | Storing env values here so we can later easily enable roadrunner cache (www.roadrunner.dev)
     */
 
+    /* Toggle API between local and external, set 'api_key_setting' to 'external' to use external api verification, else the variable is the apikey  */
+    'api_key_setting' => 'apikey2020202',
+    'api_key_local_var' => [
+        'ip_allowed' => '127.0.0.1',
+        'balance_url' => 'https://gamecontroller.westreels.com/dev/getBalance',
+        'result_url' => 'https://gamecontroller.westreels.com/dev/result',
+        'cashier_url' => 'https://gamecontroller.westreels.com/cashier',
+    ],
+
+
     /* Server ip used for internal router middleware */
     'server_ip' => env('APP_SERVER_IP', '127.0.0.1'),
+
+    /* Generate hashmac for header in API on testing purposes */
+    'hashmac_sign_creator' => true,
 
     /* Absolute Filepath location of the westreels main package */
     'package_main_path' => '/home/ploi/gamecontroller.westreels.com/westreels/westreels-main',

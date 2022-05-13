@@ -17,7 +17,6 @@ class Gamesessions extends Eloquent  {
         'currency',
         'extra_meta',
         'token_original',
-        'game_id_original',
         'games_amount',
         'expired_bool',
         'created_at',

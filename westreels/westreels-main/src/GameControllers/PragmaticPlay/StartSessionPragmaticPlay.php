@@ -1,27 +1,53 @@
- <?php
-
+<?php
 namespace Westreels\WestreelsMain\GameControllers\PragmaticPlay;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Models\User;
+use Illuminate\Support\Facades\Http;
+use Westreels\WestreelsMain\Models\Gamesessions;
+use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class StartSessionPragmaticPlay
 {
+    public function pragmaticplayTestSession(Request $request)
+    {
+        $selectGame = DB::table('gamelist_pragmatic')->where('game_id', $request->game_id)->first();
+        $strLowerProvider = strtolower($selectGame->provider);
+        $buildArray = array(
+            'game_id' => $selectGame->game_id,
+            'game_name' => $selectGame->fullName,
+            'api_origin_id' => $selectGame->api_origin_id,
+            'api_extension' => $selectGame->api_extension,
+            'provider' => $strLowerProvider,
+            'player' => User::get()->random('1'),
+            'currency' => 'USD', // should be in request
+            'mode' => 'real', //should be in request demo/real money play
+            'method' => 'gameRequestByPlayer',
+        );
+        return Http::timeout(5)->get(config('app.url').'/dev/pragmaticplaySessionStart', $buildArray);
+
+
+    }
 
     public function pragmaticplaySessionStart(Request $request)
-    {
+    {   
 
         $fullContent = $request;
 
         //Check if existing internal session is available
-        $getInternalSession = GameSessions::where('game_id', $fullContent->game_id)->where('player_id', $fullContent->player)->where('currency', $fullContent->currency)->where('created_at', '>', Carbon::now()->subMinutes(45))->first();
+        $getInternalSession = Gamesessions::where('game_id', $fullContent->game_id)->where('player_id', $fullContent->player)->where('currency', $fullContent->currency)->where('created_at', '>', Carbon::now()->subMinutes(45))->first();
         $newSession = false;
 
         if(!$getInternalSession) {
-            $createInternalSession = GameSessions::create([
+            $createInternalSession = Gamesessions::create([
                 'game_id' => $fullContent->game_id,
                 'token_internal' => Str::uuid(),
                 'token_original' => '0',
                 'currency' => $fullContent->currency,
                 'extra_meta' => $request->api_origin_id,
                 'expired_bool' => 0,
+                'games_amount' => 0,
                 'player_id' => $fullContent->player,
                 'created_at' => now(),
                 'updated_at' => now(),

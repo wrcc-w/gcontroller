@@ -3,17 +3,30 @@
 use Illuminate\Support\Facades\Route;
 use Westreels\WestreelsMain;
 use Illuminate\Http\Request;
-use Spatie\SslCertificate\SslCertificate;
 
 Route::group(['middleware' => ['api']], function () {
-        Route::post('/player/create', '\Westreels\WestreelsMain\Gate\PlayerGateController@playerLogin');
+        Route::post('/player/login', '\Westreels\WestreelsMain\Gate\PlayerGateController@playerLogin');
+
+Route::get('/dev/pragmaticplaySessionStart', '\Westreels\WestreelsMain\GameControllers\PragmaticPlay\StartSessionPragmaticPlay@pragmaticplaySessionStart');
+
+        
+});
+
+Route::group(['middleware' => ['auth:api']], function () {
+    Route::get('/teete', function () {  
+        return 'test';
+    });
 });
 
 
-// Auth test
-Route::middleware(['auth:sanctum'])->group(function () {
-	Route::get('/indextest', 'WestreelsMain@indexTest');
-});
+
+Route::get('/testprag', '\Westreels\WestreelsMain\GameControllers\PragmaticPlay\StartSessionPragmaticPlay@pragmaticplayTestSession');
+ 
+
+
+
+Route::get('/dev/hashmacCreate', '\Westreels\WestreelsMain\Gate\GateFunctions@hashmacCreate');
+
 
 
 Route::get('/westreelssl', function () {  
