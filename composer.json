@@ -10,6 +10,7 @@
         "url": "./westreels/westreels-main"
     }
     ],
+    
     "require": {
         "php": "^8.0.2",
         "guzzlehttp/guzzle": "^7.2",
@@ -17,7 +18,6 @@
         "laravel/sanctum": "^2.14.1",
         "laravel/tinker": "^2.7",
         "livewire/livewire": "^2.10",
-        "spatie/ssl-certificate": "^2.1",
         "westreels/westreels-main": "*"
     },
     "require-dev": {
