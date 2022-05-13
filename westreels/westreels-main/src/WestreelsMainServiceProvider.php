@@ -20,7 +20,7 @@ class WestreelsMainServiceProvider extends PackageServiceProvider
             ->name('westreels-main')
             ->hasMigrations(['create_westreels_gamesessions_table', 'create_westreels_gamelist_pragmatic_table', 'modify_users_table'])
             ->hasConfigFile(['westreels-main', 'gameconfig'])
-            ->hasViews()
+            ->hasViews('westreels')
             ->hasRoutes(['web', 'api'])
             ->hasCommand(WestreelsMainCommand::class);
     }
